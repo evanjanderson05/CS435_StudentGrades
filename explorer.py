@@ -1,6 +1,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
+import seaborn as sns
 
 file_path = "studentData.csv" # The path to the csv dataset
 df = pd.read_csv(file_path) # Load the dataset
@@ -52,12 +53,35 @@ def graphCategorical(col):
     plt.tight_layout() # Adjust spacing
     plt.show()
 
+def corrMatrix(graph = False): # Optional graph parameter for ease of examination
+    if not graph: # If graph is false, exit the function
+        return
+    df_encoded = df.copy() # Copy the df
+    for col in df_encoded.select_dtypes(include=['object', 'category']).columns: # Select categorical columns
+        df_encoded[col] = df_encoded[col].astype("category").cat.codes # Convert columns into categorical type for heatmapping
+
+    corr_matrix = df_encoded.corr() # Create correlation matrix
+
+    plt.figure() # Create figure
+    sns.heatmap(
+        corr_matrix, # Use corr_matrix data
+        annot=True, # Write numbers onto each cell
+        fmt=".2f", # Two decimals
+        cmap="coolwarm", # Blue for negative, red for positive, white for neutral
+        vmin=-1, vmax=1 # Min correlation -1, max correlation 1 (for colors)
+    )
+    plt.title("Feature Correlation Matrix")
+    plt.show()
+
+
 ##################
 # MAIN EXECUTION #
 ##################
 
 for col in df.columns:
-    featureDetails(col, True) # Get the feature details for each feature
+    featureDetails(col, False) # Get the feature details for each feature
+
+corrMatrix(True) # Graph the correlation matrix
 
 
 ###########
